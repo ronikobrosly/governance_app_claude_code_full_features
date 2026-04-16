@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudGov Platform — Claude Code Feature Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0c0e14;
+    --surface: #13161f;
+    --surface-2: #1a1e2a;
+    --border: #252a3a;
+    --text: #c8cdd8;
+    --text-dim: #6b7280;
+    --text-bright: #e8ecf4;
+    --accent-blue: #5b9cf6;
+    --accent-purple: #a78bfa;
+    --accent-green: #34d399;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-cyan: #22d3ee;
+    --accent-pink: #f472b6;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    padding: 32px 24px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #111420 0%, var(--bg) 100%);
+  }
+
+  .header h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 16px 24px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .tab:hover { color: var(--text); }
+
+  .tab.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+  }
+
+  .content {
+    padding: 20px 24px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .section-intro strong { color: var(--text-bright); }
+
+  .file-group {
+    margin-bottom: 16px;
+  }
+
+  .file-group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+
+  .file-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .file-card:hover { border-color: #3a4058; }
+
+  .file-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .file-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .file-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-bright);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-badge {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .file-detail {
+    padding: 0 14px 12px 32px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    display: none;
+  }
+
+  .file-detail.open { display: block; }
+
+  .file-detail code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent-cyan);
+  }
+
+  .file-detail ul {
+    margin: 4px 0 4px 16px;
+    list-style: none;
+  }
+
+  .file-detail ul li::before {
+    content: "→ ";
+    color: var(--text-dim);
+  }
+
+  .connection-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border-left: 2px solid var(--accent-purple);
+    border-radius: 0 4px 4px 0;
+    font-size: 11px;
+    color: var(--accent-purple);
+  }
+
+  /* Color coding by feature type */
+  .color-claudemd { background: var(--accent-blue); }
+  .color-hook { background: var(--accent-amber); }
+  .color-skill { background: var(--accent-green); }
+  .color-agent { background: var(--accent-purple); }
+  .color-command { background: var(--accent-cyan); }
+  .color-config { background: var(--accent-pink); }
+  .color-source { background: var(--text-dim); }
+  .color-test { background: var(--accent-red); }
+
+  .badge-claudemd { background: rgba(91,156,246,0.15); color: var(--accent-blue); }
+  .badge-hook { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
+  .badge-skill { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+  .badge-agent { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+  .badge-command { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
+  .badge-config { background: rgba(244,114,182,0.15); color: var(--accent-pink); }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .flow-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 2;
+    color: var(--text-dim);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .flow-diagram .highlight-blue { color: var(--accent-blue); }
+  .flow-diagram .highlight-green { color: var(--accent-green); }
+  .flow-diagram .highlight-amber { color: var(--accent-amber); }
+  .flow-diagram .highlight-purple { color: var(--accent-purple); }
+  .flow-diagram .highlight-cyan { color: var(--accent-cyan); }
+  .flow-diagram .highlight-pink { color: var(--accent-pink); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>cloudgov-platform</h1>
+  <p>Claude Code Feature Reference — every configuration element annotated</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" style="color:var(--accent-blue)">4</div>
+      <div class="stat-label">CLAUDE.md files</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--accent-amber)">4</div>
+      <div class="stat-label">Hooks</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--accent-green)">3</div>
+      <div class="stat-label">Skills</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--accent-purple)">4</div>
+      <div class="stat-label">Subagents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--accent-cyan)">2</div>
+      <div class="stat-label">Commands</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:var(--text-dim)">53</div>
+      <div class="stat-label">Total files</div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot color-claudemd"></div>CLAUDE.md</div>
+  <div class="legend-item"><div class="legend-dot color-hook"></div>Hook</div>
+  <div class="legend-item"><div class="legend-dot color-skill"></div>Skill</div>
+  <div class="legend-item"><div class="legend-dot color-agent"></div>Subagent</div>
+  <div class="legend-item"><div class="legend-dot color-command"></div>Command</div>
+  <div class="legend-item"><div class="legend-dot color-config"></div>Config</div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="overview">Overview</button>
+  <button class="tab" data-tab="claudemd">CLAUDE.md</button>
+  <button class="tab" data-tab="hooks">Hooks</button>
+  <button class="tab" data-tab="skills">Skills</button>
+  <button class="tab" data-tab="agents">Subagents</button>
+  <button class="tab" data-tab="commands">Commands</button>
+  <button class="tab" data-tab="flows">How It Connects</button>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+const sections = {
+  overview: () => `
+    <div class="section-intro">
+      This project demonstrates <strong>every major Claude Code configuration feature</strong>
+      applied to a realistic Python backend — cloud service controls, a threat registry,
+      and governance data. Click any file below to see what it does and how it connects
+      to other features. Use the tabs above to explore each feature category.
+    </div>
+
+    <div class="flow-diagram">
+<span class="highlight-blue">CLAUDE.md files</span> tell Claude the rules of the codebase
+        ↓
+<span class="highlight-green">Skills</span> give Claude step-by-step playbooks for recurring tasks
+        ↓
+<span class="highlight-purple">Subagents</span> let Claude delegate to focused workers in parallel
+        ↓
+<span class="highlight-amber">Hooks</span> run lint/tests automatically after every edit
+        ↓
+<span class="highlight-cyan">Commands</span> combine all of the above into one-shot workflows
+        ↓
+<span class="highlight-pink">settings.json</span> wires hooks, permissions, and agent teams together
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">Claude Code Configuration</div>
+      ${fileCard('.claude/settings.json', 'config', 'Config', 'Central configuration: hooks (PostToolUse runs lint+tests after every edit, PreToolUse blocks destructive DB commands), permissions, and <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code> to enable multi-agent coordination.')}
+      ${fileCard('CLAUDE.md', 'claudemd', 'Root', 'Project-level instructions: philosophy, repo layout, key commands (<code>ruff check</code>, <code>pytest</code>), conventions for logging/errors/testing, ETL patterns, and business logic notes. Claude reads this at session start.')}
+      ${fileCard('pyproject.toml', 'config', 'Config', 'Ruff lint rules, mypy strict mode, pytest markers — the tools that hooks and CI both invoke.')}
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">Source Code (18 Python files, ~1400 lines)</div>
+      ${fileCard('src/models/ (5 files)', 'source', 'Models', 'SQLAlchemy ORM: Control, CloudService, Threat, ThreatControlMapping, GovernancePolicy, ETLJobRun. All use UUID PKs and timestamp mixins.', 'source')}
+      ${fileCard('src/services/ (2 files)', 'source', 'Services', 'Business logic: control lifecycle (draft→active→deprecated→archived), computed risk scores. Never imports FastAPI.', 'source')}
+      ${fileCard('src/etl/ (3 files)', 'source', 'ETL', 'BasePipeline ABC, registry pattern, and a sample threat feed pipeline with Pydantic validation.', 'source')}
+      ${fileCard('src/api/ (2 files)', 'source', 'API', 'FastAPI routers with Pydantic schemas. Maps domain exceptions to HTTP status codes.', 'source')}
+    </div>
+  `,
+
+  claudemd: () => `
+    <div class="section-intro">
+      <strong>CLAUDE.md files</strong> are Claude Code's memory. The root file loads at session start;
+      subdirectory files load on demand when Claude enters that directory. Together they form a
+      layered instruction set — general rules at the top, specific patterns deeper in the tree.
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">4 CLAUDE.md Files</div>
+      ${fileCard('CLAUDE.md', 'claudemd', 'Root', `The main project brain. Contains:
+        <ul>
+          <li>Project philosophy (reliability, auditability, idempotency)</li>
+          <li>Complete repo layout diagram</li>
+          <li>Exact commands to validate changes: <code>ruff check</code>, <code>mypy</code>, <code>pytest</code></li>
+          <li>Conventions: structlog logging, domain exceptions, import rules, naming</li>
+          <li>ETL pipeline pattern (extract→validate→transform→load→audit)</li>
+          <li>Business logic notes: control lifecycle, threat mappings, policy versioning, computed risk scores</li>
+        </ul>
+        <div class="connection-note">The lint/test commands here are the same ones wired into PostToolUse hooks in settings.json — so Claude runs them manually when asked AND automatically after edits.</div>`)}
+      ${fileCard('src/CLAUDE.md', 'claudemd', 'Source', `Code-level conventions that apply to all source files:
+        <ul>
+          <li>Import ordering (stdlib → third-party → local, enforced by ruff)</li>
+          <li>Async patterns: <code>async with get_session()</code>, never commit inside services</li>
+          <li>Type hints: full signatures, <code>uuid.UUID</code> for IDs, explicit <code>None</code> returns</li>
+          <li>Config: pydantic-settings, <code>CLOUDGOV_</code> env prefix, no hardcoded values</li>
+        </ul>`)}
+      ${fileCard('src/etl/CLAUDE.md', 'claudemd', 'ETL', `ETL-specific patterns — loaded when Claude works in the etl/ directory:
+        <ul>
+          <li>Step-by-step guide for adding a new pipeline</li>
+          <li>Idempotency rules: ON CONFLICT upserts, natural keys only</li>
+          <li>Error handling: never abort batch for single-record failures, use PipelineResult</li>
+          <li>Rate limiting and retry rules for external API calls</li>
+        </ul>
+        <div class="connection-note">The <code>/new-etl-job</code> skill builds on these instructions — it references the same patterns but adds a concrete file-creation workflow.</div>`)}
+      ${fileCard('tests/CLAUDE.md', 'claudemd', 'Tests', `Testing conventions — loaded when Claude works in tests/:
+        <ul>
+          <li>File mirroring rule: <code>src/services/x.py</code> → <code>tests/unit/test_x.py</code></li>
+          <li>Unit tests: mock all externals, one behavior per test, parametrize edge cases</li>
+          <li>Integration tests: use test_db fixture, httpx.AsyncClient, factory seeding</li>
+          <li>What NOT to test: model field definitions, third-party internals, private methods</li>
+        </ul>
+        <div class="connection-note">The <code>test-writer</code> subagent reads this file to understand the testing conventions before writing any tests.</div>`)}
+    </div>
+  `,
+
+  hooks: () => `
+    <div class="section-intro">
+      <strong>Hooks</strong> fire shell commands at specific moments in Claude Code's lifecycle.
+      They're configured in <code>.claude/settings.json</code> and the scripts live in <code>scripts/hooks/</code>.
+      Hooks make Claude Code <strong>self-correcting</strong> — it sees lint errors and test failures
+      immediately after making changes, without you asking.
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">PostToolUse — After Every File Edit</div>
+      ${fileCard('PostToolUse → ruff check', 'hook', 'Auto-lint', `Runs after any Edit or Write tool call:
+        <ul>
+          <li>Command: <code>ruff check src/ tests/ --fix --quiet</code></li>
+          <li>Auto-fixes import ordering, unused imports, style issues</li>
+          <li>Output (last 20 lines) is injected back into Claude's context</li>
+          <li>Claude sees the issues and can address them immediately</li>
+        </ul>`)}
+      ${fileCard('PostToolUse → pytest', 'hook', 'Auto-test', `Also runs after Edit/Write:
+        <ul>
+          <li>Command: <code>pytest tests/unit/ -x -q --tb=line</code></li>
+          <li>Runs fast unit tests only (no DB required)</li>
+          <li>Stops at first failure (<code>-x</code>) for quick feedback</li>
+          <li>If a test breaks, Claude sees the failure and fixes it in the same turn</li>
+        </ul>
+        <div class="connection-note">This is the single most impactful hook. It turns Claude from "write code and hope" into "write code, see it break, fix it" — all automatically.</div>`)}
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">PreToolUse — Before Bash Commands</div>
+      ${fileCard('scripts/hooks/validate_no_destructive_db.sh', 'hook', 'Guard', `Intercepts every Bash command before execution:
+        <ul>
+          <li>Blocks: DROP TABLE, DROP DATABASE, TRUNCATE, DELETE FROM...WHERE 1</li>
+          <li>Also blocks <code>alembic downgrade base</code></li>
+          <li>Exit code 2 = blocked (error message fed back to Claude)</li>
+          <li>Exit code 0 = allowed</li>
+        </ul>`)}
+      ${fileCard('scripts/hooks/validate_readonly_query.sh', 'hook', 'Guard', `Used by the <code>db-reader</code> subagent specifically:
+        <ul>
+          <li>Blocks all write operations: INSERT, UPDATE, DELETE, DROP, ALTER, GRANT</li>
+          <li>Only allows SELECT, EXPLAIN, and describe commands</li>
+          <li>Ensures the db-reader agent truly can't modify data</li>
+        </ul>
+        <div class="connection-note">This hook is referenced in the db-reader subagent's frontmatter, not in the global settings.json. It only applies when that agent runs.</div>`)}
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">Notification & Stop</div>
+      ${fileCard('scripts/hooks/notify_slack.sh', 'hook', 'Notify', `Fires when Claude Code needs your attention:
+        <ul>
+          <li>If <code>SLACK_WEBHOOK_URL</code> is set, posts to Slack</li>
+          <li>Falls back to macOS native notification via <code>osascript</code></li>
+          <li>Useful when running agents in background — you get pinged when they need input</li>
+        </ul>`)}
+      ${fileCard('scripts/hooks/session_summary.sh', 'hook', 'Audit', `Fires when Claude Code finishes responding:
+        <ul>
+          <li>Captures <code>git diff --stat</code> and uncommitted changes</li>
+          <li>Writes a markdown session log to <code>~/.claude/session-logs/</code></li>
+          <li>Creates an audit trail of what Claude changed per session</li>
+        </ul>`)}
+    </div>
+  `,
+
+  skills: () => `
+    <div class="section-intro">
+      <strong>Skills</strong> are reusable playbooks that turn recurring multi-step tasks into
+      slash commands. Instead of writing a verbose prompt every time you need a new ETL pipeline,
+      you type <code>/new-etl-job</code> and Claude follows a proven recipe. Skills live in
+      <code>.claude/skills/</code> as SKILL.md files.
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">3 Project Skills</div>
+      ${fileCard('.claude/skills/new-etl-job/SKILL.md', 'skill', '/new-etl-job', `Scaffolds a complete ETL pipeline in 6 steps:
+        <ul>
+          <li><strong>Step 1</strong>: Gathers requirements (source, entity, format, natural key)</li>
+          <li><strong>Step 2</strong>: Creates pipeline file inheriting BasePipeline</li>
+          <li><strong>Step 3</strong>: Registers in <code>src/etl/registry.py</code></li>
+          <li><strong>Step 4</strong>: Writes unit tests (happy path + validation errors)</li>
+          <li><strong>Step 5</strong>: Writes integration test (DB writes + idempotency)</li>
+          <li><strong>Step 6</strong>: Runs ruff + pytest to verify</li>
+        </ul>
+        <div class="connection-note">This skill builds on the patterns documented in <code>src/etl/CLAUDE.md</code> — the CLAUDE.md explains the "why", the skill automates the "how".</div>`)}
+      ${fileCard('.claude/skills/refactor-module/SKILL.md', 'skill', '/refactor-module', `Safe refactoring workflow that coordinates multiple subagents:
+        <ul>
+          <li><strong>Phase 1</strong>: Spawns the <code>explorer</code> subagent for impact analysis</li>
+          <li><strong>Phase 2</strong>: Creates a plan and gets user approval</li>
+          <li><strong>Phase 3</strong>: Executes changes in safe order (create → move → update imports → delete)</li>
+          <li><strong>Phase 4</strong>: Runs full validation (ruff + mypy + pytest)</li>
+          <li><strong>Phase 5</strong>: Spawns the <code>test-writer</code> subagent to fill coverage gaps</li>
+        </ul>
+        <div class="connection-note">This is a skill that orchestrates subagents — it shows how skills and agents compose. The explorer finds what's affected, the main agent does the work, and the test-writer cleans up.</div>`)}
+      ${fileCard('.claude/skills/add-data-model/SKILL.md', 'skill', '/add-data-model', `Creates a full vertical slice — model through tests:
+        <ul>
+          <li>SQLAlchemy model with UUID PK and timestamp mixins</li>
+          <li>Service layer with get/list/create + structlog logging</li>
+          <li>FastAPI router with Pydantic schemas</li>
+          <li>Unit tests for service, integration tests for API</li>
+          <li>Conftest fixture for the new entity</li>
+          <li>Includes a checklist to verify nothing was missed</li>
+        </ul>`)}
+    </div>
+  `,
+
+  agents: () => `
+    <div class="section-intro">
+      <strong>Subagents</strong> are specialized workers with their own context windows, tool permissions,
+      and system prompts. They're defined in <code>.claude/agents/</code> as markdown files with YAML
+      frontmatter. The main session spawns them via the Task tool, and they report back when done.
+      Each agent can only use the tools you allow.
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">4 Subagents</div>
+      ${fileCard('.claude/agents/explorer.md', 'agent', 'Read-only', `<strong>Codebase Explorer</strong> — research without modifying files:
+        <ul>
+          <li><strong>Tools</strong>: Read, Grep, Glob, View, find, wc, cat, head, tail</li>
+          <li><strong>Blocked</strong>: Edit, Write, rm, mv, git commit, git push</li>
+          <li><strong>Model</strong>: Sonnet (fast + cheap for exploration)</li>
+          <li><strong>Memory</strong>: project-scoped (remembers findings across sessions)</li>
+          <li><strong>Uses</strong>: Impact analysis, dependency mapping, pattern search, architecture summaries</li>
+        </ul>
+        <div class="connection-note">The <code>/refactor-module</code> skill spawns this agent in Phase 1 to map out what will be affected before any code changes happen.</div>`)}
+      ${fileCard('.claude/agents/test-writer.md', 'agent', 'Tests only', `<strong>Test Writer</strong> — only modifies files in tests/:
+        <ul>
+          <li><strong>Tools</strong>: Read, Grep, Glob, View, Edit, Write, pytest</li>
+          <li><strong>Blocked</strong>: rm, git push</li>
+          <li><strong>Model</strong>: Sonnet</li>
+          <li><strong>Workflow</strong>: Read source → check existing tests → write new tests → run them → report</li>
+          <li><strong>Follows</strong>: conventions from <code>tests/CLAUDE.md</code></li>
+        </ul>`)}
+      ${fileCard('.claude/agents/security-reviewer.md', 'agent', 'Audit', `<strong>Security Reviewer</strong> — audits code for vulnerabilities:
+        <ul>
+          <li><strong>Tools</strong>: Read, Grep, Glob, git diff, git log, bandit</li>
+          <li><strong>Blocked</strong>: Edit, Write, rm, git commit, git push</li>
+          <li><strong>Model</strong>: Opus (needs deeper reasoning for security analysis)</li>
+          <li><strong>Checks</strong>: SQL injection, auth bypasses, PII in logs, vulnerable deps, ETL trust boundaries</li>
+        </ul>
+        <div class="connection-note">The <code>/pre-pr</code> command spawns this agent in parallel with the lint/test checks for a comprehensive review before pushing.</div>`)}
+      ${fileCard('.claude/agents/db-reader.md', 'agent', 'Read-only DB', `<strong>Database Reader</strong> — runs SELECT queries only:
+        <ul>
+          <li><strong>Tools</strong>: Bash, Read, View</li>
+          <li><strong>Custom hook</strong>: PreToolUse hook validates every Bash command is read-only</li>
+          <li><strong>Model</strong>: Sonnet</li>
+          <li><strong>Rules</strong>: LIMIT 100 on all queries, redact PII in output</li>
+          <li><strong>Uses</strong>: Debugging ETL outputs, checking data state, verifying migrations</li>
+        </ul>
+        <div class="connection-note">This agent has its own PreToolUse hook defined in its frontmatter — <code>validate_readonly_query.sh</code> — separate from the global hooks in settings.json.</div>`)}
+    </div>
+  `,
+
+  commands: () => `
+    <div class="section-intro">
+      <strong>Slash commands</strong> are prompt templates stored in <code>.claude/commands/</code>.
+      They're the predecessor to skills but still fully supported. Commands are great for
+      workflows that orchestrate multiple subagents or combine several tools. Invoke them with
+      <code>/project:command-name</code>.
+    </div>
+
+    <div class="file-group">
+      <div class="file-group-title">2 Slash Commands</div>
+      ${fileCard('.claude/commands/research.md', 'command', '/project:research', `Parallel research using 3 subagents simultaneously:
+        <ul>
+          <li><strong>Web Documentation Agent</strong>: searches official docs, best practices, GitHub issues</li>
+          <li><strong>Codebase Explorer Agent</strong>: searches the codebase using the <code>explorer</code> subagent type</li>
+          <li><strong>Community Agent</strong>: searches Stack Overflow for solutions and pitfalls</li>
+          <li>All three launch <strong>in parallel</strong> in a single message</li>
+          <li>Results are synthesized into a markdown report at <code>docs/research/</code></li>
+        </ul>
+        <div class="connection-note">Usage: <code>/project:research "how to implement row-level security in SQLAlchemy"</code> — the $ARGUMENTS placeholder gets replaced with your topic.</div>`)}
+      ${fileCard('.claude/commands/pre-pr.md', 'command', '/project:pre-pr', `Pre-push review checklist:
+        <ul>
+          <li><strong>Step 1</strong>: Runs ruff, mypy, unit tests, integration tests sequentially</li>
+          <li><strong>Step 2</strong>: Spawns <code>security-reviewer</code> agent to audit the diff</li>
+          <li><strong>Step 3</strong>: Generates a PR description from the diff</li>
+          <li><strong>Step 4</strong>: Reports everything together</li>
+        </ul>
+        <div class="connection-note">This command combines hooks (auto-testing), subagents (security review), and regular tool use (git diff) into a single workflow.</div>`)}
+    </div>
+  `,
+
+  flows: () => `
+    <div class="section-intro">
+      Here's how the features compose in real workflows. Each scenario shows which
+      Claude Code features fire and in what order.
+    </div>
+
+    <div class="flow-diagram">
+<span class="highlight-cyan">Scenario: You type "/new-etl-job"</span>
+
+1. Claude loads the <span class="highlight-green">new-etl-job skill</span> from .claude/skills/
+2. Skill instructions say to ask you for source name, entity, etc.
+3. Claude creates the pipeline file → <span class="highlight-amber">PostToolUse hook fires</span>
+   ├── ruff auto-fixes the new file
+   └── pytest runs → Claude sees if anything broke
+4. Claude creates the test file → <span class="highlight-amber">hooks fire again</span>
+5. Claude runs the tests to verify → all green ✓
+    </div>
+
+    <div class="flow-diagram">
+<span class="highlight-cyan">Scenario: You type "/refactor-module"</span>
+
+1. Claude loads the <span class="highlight-green">refactor-module skill</span>
+2. Skill says: spawn <span class="highlight-purple">explorer agent</span> first
+   └── Explorer reads the codebase (read-only), produces impact report
+3. Claude writes a refactor plan → waits for your approval
+4. You approve → Claude starts editing files
+   └── Every edit triggers <span class="highlight-amber">PostToolUse hooks</span> (lint + test)
+5. After all edits, skill says: spawn <span class="highlight-purple">test-writer agent</span>
+   └── Test-writer adds missing test coverage
+6. <span class="highlight-amber">Hooks</span> run on the new test files too → all green ✓
+    </div>
+
+    <div class="flow-diagram">
+<span class="highlight-cyan">Scenario: You type "/project:pre-pr"</span>
+
+1. Claude loads the <span class="highlight-cyan">pre-pr command</span>
+2. Runs lint + type check + tests sequentially in Bash
+3. In parallel, spawns <span class="highlight-purple">security-reviewer agent</span>
+   └── Reviews git diff for vulnerabilities (read-only)
+4. Synthesizes all results into a PR description
+5. <span class="highlight-amber">Notification hook</span> pings Slack when done
+    </div>
+
+    <div class="flow-diagram">
+<span class="highlight-cyan">Scenario: Agent Teams (multi-agent refactor)</span>
+
+1. You ask Claude to change output format + DB target
+2. Claude (team lead) spawns 3 <span class="highlight-purple">teammates</span>:
+   ├── Agent A: output formatter (own context window)
+   ├── Agent B: DB connection layer (own context window)
+   └── Agent C: test updates (waits for A & B)
+3. A & B work in parallel on <span class="highlight-pink">isolated git worktrees</span>
+4. Each edit triggers <span class="highlight-amber">PostToolUse hooks</span> in that agent's session
+5. Agents message each other via shared task list
+6. Team lead synthesizes results when all complete
+7. <span class="highlight-amber">Stop hook</span> writes session summary to disk
+    </div>
+  `
+};
+
+function fileCard(path, colorClass, badge, detail, iconClass) {
+  const id = path.replace(/[^a-zA-Z0-9]/g, '_');
+  const ic = iconClass || colorClass;
+  return `
+    <div class="file-card">
+      <div class="file-header" onclick="toggle('${id}')">
+        <div class="file-icon color-${ic}"></div>
+        <div class="file-path">${path}</div>
+        <div class="file-badge badge-${colorClass}">${badge}</div>
+      </div>
+      <div class="file-detail" id="${id}">${detail}</div>
+    </div>
+  `;
+}
+
+function toggle(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function showTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById('content').innerHTML = sections[tabName]();
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  if (e.target.classList.contains('tab')) {
+    showTab(e.target.dataset.tab);
+  }
+});
+
+// Initial render
+showTab('overview');
+</script>
+</body>
+</html>
