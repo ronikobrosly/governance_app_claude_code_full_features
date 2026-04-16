@@ -1,0 +1,71 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "View"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(DROP TABLE)",
+      "Bash(DROP DATABASE)"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd $CWD && ruff check src/ tests/ --fix --quiet 2>&1 | tail -20"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd $CWD && python -m pytest tests/unit/ -x -q --tb=line 2>&1 | tail -15"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/hooks/validate_no_destructive_db.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/hooks/notify_slack.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/hooks/session_summary.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
